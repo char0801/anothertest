@@ -28,10 +28,9 @@ function typeLetter() {
 }
 typeLetter();
 
-// Formsubmit email sender
+// Send response via Formsubmit
 function sendResponse(response) {
-  const input = document.getElementById("responseInput");
-  input.value = response;
+  document.getElementById("responseInput").value = response;
   document.getElementById("responseForm").submit();
 }
 
@@ -63,18 +62,13 @@ function moveButton() {
   const maxTop = window.innerHeight - btnHeight - edgeBuffer;
   const maxLeft = window.innerWidth - btnWidth - edgeBuffer;
 
-  let newTop, newLeft;
-  let attempts = 0;
+  let newTop, newLeft, attempts = 0;
 
   do {
     newTop = getRandomNumber(edgeBuffer, maxTop);
     newLeft = getRandomNumber(edgeBuffer, maxLeft);
     attempts++;
-    if (attempts > 300) {
-      newTop = edgeBuffer;
-      newLeft = edgeBuffer;
-      break;
-    }
+    if (attempts > 300) break;
   } while (
     (newTop < textRect.bottom + buffer) || // avoid text
     (newLeft + btnWidth > yesRect.left - buffer &&
@@ -83,21 +77,18 @@ function moveButton() {
      newTop < yesRect.bottom + buffer)      // avoid Yes button
   );
 
+  // Keep within screen
+  newTop = Math.min(Math.max(newTop, edgeBuffer), maxTop);
+  newLeft = Math.min(Math.max(newLeft, edgeBuffer), maxLeft);
+
   btnNo.style.top = `${newTop}px`;
   btnNo.style.left = `${newLeft}px`;
   btnNo.style.transform = "none";
 }
 
 btnNo.addEventListener("mouseover", moveButton);
-btnNo.addEventListener("click", () => {
-  sendResponse("No");  // every click sends a separate email
-  moveButton();
-});
-btnNo.addEventListener("touchstart", (e) => {
-  sendResponse("No");
-  moveButton();
-  e.preventDefault();
-});
+btnNo.addEventListener("click", () => { sendResponse("No"); moveButton(); });
+btnNo.addEventListener("touchstart", (e) => { sendResponse("No"); moveButton(); e.preventDefault(); });
 
 // Initial placement under GIF
 window.addEventListener("load", () => {
